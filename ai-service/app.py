@@ -3,7 +3,6 @@ from flask_cors import CORS
 import joblib
 import numpy as np
 import pandas as pd
-from tensorflow.keras.models import load_model
 import shap
 import os
 
@@ -268,7 +267,7 @@ def predict_demand():
     series = np.array(history).reshape(-1, 1)
 
     # take last 3 values
-    last_seq = series[-3:].reshape(1, 3, 1)
+    last_seq = series[-3:].reshape(1, -1)
 
     forecast = forecast_model.predict(last_seq)
 
