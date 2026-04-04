@@ -90,7 +90,7 @@ app.use(cors({
 }));
 
 // ✅ HANDLE PREFLIGHT REQUESTS (VERY IMPORTANT)
-app.options("*", cors());
+// app.options("*", cors());
 
 
 // ✅ BODY PARSER
