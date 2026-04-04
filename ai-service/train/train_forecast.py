@@ -1,23 +1,22 @@
+from sklearn.linear_model import LinearRegression
 import numpy as np
-import pandas as pd
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense
-from tensorflow.keras.preprocessing.sequence import TimeseriesGenerator
+import joblib
 
-# dummy demand data
 data = np.array([50, 60, 55, 70, 80, 65, 90, 85, 100, 95])
 
-# reshape for LSTM
-data = data.reshape(-1, 1)
+X = []
+y = []
 
-gen = TimeseriesGenerator(data, data, length=3, batch_size=1)
+for i in range(len(data)-3):
+    X.append(data[i:i+3])
+    y.append(data[i+3])
 
-model = Sequential()
-model.add(LSTM(50, activation="relu", input_shape=(3, 1)))
-model.add(Dense(1))
-model.compile(optimizer="adam", loss="mse")
+X = np.array(X)
+y = np.array(y)
 
-model.fit(gen, epochs=20, verbose=1)
+model = LinearRegression()
+model.fit(X, y)
 
-model.save("../models/demand_forecast_model.keras")
-print("✅ Demand forecasting model trained & saved")
+joblib.dump(model, "../models/demand_forecast_model.pkl")
+
+print("✅ Lightweight model saved")
