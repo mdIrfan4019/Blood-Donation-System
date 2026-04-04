@@ -19,8 +19,8 @@ CORS(app, origins=allowed_origins)
 # load models
 eligibility_model = joblib.load("models/eligibility_model.pkl")
 forecast_model = joblib.load("models/demand_forecast_model.pkl")
-shap_explainer = joblib.load("models/shap_explainer.pkl")
-baseline = joblib.load("models/feature_baseline.pkl")
+shap_explainer = shap.TreeExplainer(eligibility_model)
+
 
 
 # ---------------------------
@@ -202,14 +202,8 @@ def predict_eligibility():
         pred = eligibility_model.predict(features_df)[0]
         proba = eligibility_model.predict_proba(features_df)[0][1]
 
-        shap_raw = shap_explainer.shap_values(features_df)
-
-        if isinstance(shap_raw, list):
-            shap_values = shap_raw[1]
-        else:
-            shap_values = shap_raw
-
-        shap_values = np.array(shap_values).reshape(-1)
+        shap_values = shap_explainer(features_df)
+        shap_values = shap_values.values[0]
 
         shap_map = {
             feature: round(float(value), 4)
