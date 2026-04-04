@@ -19,10 +19,7 @@ CORS(app, origins=allowed_origins)
 
 # load models
 eligibility_model = joblib.load("models/eligibility_model.pkl")
-forecast_model = load_model(
-    "models/demand_forecast_model.h5",
-    compile=False
-)
+forecast_model = load_model("models/demand_forecast_model.keras", compile=False)
 shap_explainer = joblib.load("models/shap_explainer.pkl")
 baseline = joblib.load("models/feature_baseline.pkl")
 

@@ -19,6 +19,5 @@ model.compile(optimizer="adam", loss="mse")
 
 model.fit(gen, epochs=20, verbose=1)
 
-model.save("../models/demand_forecast_model.h5")
-
+model.save("../models/demand_forecast_model.keras")
 print("✅ Demand forecasting model trained & saved")
