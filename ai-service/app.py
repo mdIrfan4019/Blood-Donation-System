@@ -295,12 +295,8 @@ import os
 
 app = Flask(__name__)
 
-allowed_origins = ["http://localhost:5173", "http://localhost:5174"]
-frontend_url = os.environ.get("FRONTEND_URL")
-if frontend_url:
-    allowed_origins.append(frontend_url)
-
-CORS(app, origins=allowed_origins)
+# ✅ FIXED CORS (ALLOW ALL ORIGINS SAFELY)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # load models
 eligibility_model = joblib.load("models/eligibility_model.pkl")
