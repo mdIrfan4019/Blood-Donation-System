@@ -83,14 +83,30 @@ connectDB();
 const app = express();
 
 
-// ✅ GLOBAL CORS FIX (WORKS FOR VERCEL + LOCAL + ANY DEPLOY)
+// ✅ GLOBAL CORS FIX (EXPLICIT FOR VERCEL + LOCAL)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://blood-donation-system-vert.vercel.app"
+];
+
 app.use(cors({
-  origin: true,            // allow all origins dynamically
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = "The CORS policy for this site does not allow access from the specified Origin.";
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// ✅ HANDLE PREFLIGHT REQUESTS (VERY IMPORTANT)
-// app.options("*", cors());
+// ✅ HANDLE PREFLIGHT REQUESTS EXPLICITLY
+app.options("*", cors());
 
 
 // ✅ BODY PARSER
