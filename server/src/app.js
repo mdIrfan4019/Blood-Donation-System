@@ -106,7 +106,7 @@ app.use(cors({
 }));
 
 // ✅ HANDLE PREFLIGHT REQUESTS EXPLICITLY
-app.options("*", cors());
+app.options("(.*)", cors());
 
 
 // ✅ BODY PARSER
