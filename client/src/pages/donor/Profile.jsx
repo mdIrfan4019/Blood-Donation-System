@@ -147,6 +147,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { saveDonorProfile, fetchDonorDashboard } from "../../store/slices/donorSlice";
 import { useNavigate } from "react-router-dom";
+import { statesAndDistricts } from "../../data/indiaData";
 
 export default function Profile() {
   const dispatch = useDispatch();
@@ -315,25 +316,32 @@ const { profileLoading, error, dashboard } = useSelector((s) => s.donor);
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="label-text">State</label>
-              <input
-                type="text"
+              <select
                 required
                 value={form.state}
-                onChange={(e) => setForm({ ...form, state: e.target.value })}
+                onChange={(e) => setForm({ ...form, state: e.target.value, district: "" })}
                 className="input-field"
-                placeholder="e.g. Maharashtra"
-              />
+              >
+                <option value="">Select State</option>
+                {Object.keys(statesAndDistricts).map(state => (
+                  <option key={state} value={state}>{state}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="label-text">District</label>
-              <input
-                type="text"
+              <select
                 required
+                disabled={!form.state}
                 value={form.district}
                 onChange={(e) => setForm({ ...form, district: e.target.value })}
                 className="input-field"
-                placeholder="e.g. Mumbai"
-              />
+              >
+                <option value="">Select District</option>
+                {form.state && statesAndDistricts[form.state]?.map(district => (
+                  <option key={district} value={district}>{district}</option>
+                ))}
+              </select>
             </div>
           </div>
 

@@ -88,7 +88,7 @@ export default function HospitalForecast() {
               type="submit" disabled={loading}
               className="w-full py-4 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-[0.2em] shadow-xl hover:shadow-primary/20 hover:bg-primary transition-all disabled:opacity-50"
             >
-              {loading ? "Running Models..." : "Generate AI Forecast 🚀"}
+              {loading ? "Running Models..." : "Submit Forecast Request"}
             </button>
           </form>
         </div>

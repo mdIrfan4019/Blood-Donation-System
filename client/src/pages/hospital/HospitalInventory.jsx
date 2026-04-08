@@ -3,6 +3,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchInventoryThunk, addInventoryThunk, clearHospitalStatus, fetchHospitalProfile } from "../../store/slices/hospitalSlice";
 import { Navigate } from "react-router-dom";
 
+const COMPONENT_DEFAULTS = {
+  "Whole Blood": { shelfLife: 35, temp: "2-6°C" },
+  "RBC": { shelfLife: 42, temp: "2-6°C" },
+  "Plasma": { shelfLife: 365, temp: "-18°C or colder" },
+  "Platelets": { shelfLife: 5, temp: "20-24°C" },
+  "Cryoprecipitate": { shelfLife: 365, temp: "-18°C or colder" },
+};
+
+const getFutureDate = (days) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().split("T")[0];
+};
+
 export default function HospitalInventory() {
   const dispatch = useDispatch();
   const { inventory, loading, error, success, profile, profileLoading } = useSelector((s) => s.hospital);
@@ -19,8 +33,8 @@ export default function HospitalInventory() {
     bloodGroup: "A+",
     component: "Whole Blood",
     unitsAvailable: "",
-    expiryDate: "",
-    temperature: "",
+    expiryDate: getFutureDate(COMPONENT_DEFAULTS["Whole Blood"].shelfLife),
+    temperature: COMPONENT_DEFAULTS["Whole Blood"].temp,
   });
 
   useEffect(() => {
@@ -31,16 +45,28 @@ export default function HospitalInventory() {
   useEffect(() => {
     if (success && success.includes("added")) {
       setShowAddForm(false);
+      const defaultComp = "Whole Blood";
       setForm({
         bloodGroup: "A+",
-        component: "Whole Blood",
+        component: defaultComp,
         unitsAvailable: "",
-        expiryDate: "",
-        temperature: "",
+        expiryDate: getFutureDate(COMPONENT_DEFAULTS[defaultComp].shelfLife),
+        temperature: COMPONENT_DEFAULTS[defaultComp].temp,
       });
       // Optionally alert or just let the success message in the state handle it
     }
   }, [success]);
+
+  const handleComponentChange = (e) => {
+    const component = e.target.value;
+    const defaults = COMPONENT_DEFAULTS[component];
+    setForm(prev => ({
+      ...prev,
+      component,
+      expiryDate: defaults ? getFutureDate(defaults.shelfLife) : prev.expiryDate,
+      temperature: defaults ? defaults.temp : prev.temperature
+    }));
+  };
 
   const submit = (e) => {
     e.preventDefault();
@@ -62,7 +88,7 @@ export default function HospitalInventory() {
           </div>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="px-8 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/30 hover:-translate-y-1 transition-all"
+            className="px-8 py-4 bg-gradient-to-r from-red-600 to-rose-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-red-500/30 hover:-translate-y-1 transition-all"
           >
             {showAddForm ? "Close Form" : "Add New Unit +"}
           </button>
@@ -103,7 +129,7 @@ export default function HospitalInventory() {
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Component Type</label>
                 <select
                   value={form.component}
-                  onChange={(e) => setForm({ ...form, component: e.target.value })}
+                  onChange={handleComponentChange}
                   className="input-field w-full px-6 py-4 rounded-2xl bg-white/50 dark:bg-slate-900/50"
                   required
                 >
@@ -131,6 +157,7 @@ export default function HospitalInventory() {
                 <input
                   type="date"
                   value={form.expiryDate}
+                  min={new Date().toISOString().split("T")[0]}
                   onChange={(e) => setForm({ ...form, expiryDate: e.target.value })}
                   className="input-field w-full px-6 py-4 rounded-2xl bg-white/50 dark:bg-slate-900/50"
                   required
@@ -169,8 +196,11 @@ export default function HospitalInventory() {
                   <span className="px-4 py-1.5 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-sm font-black rounded-xl border border-red-200 dark:border-red-800/50 shadow-sm">
                     {item.bloodGroup}
                   </span>
-                  <span className={`text-[10px] font-black uppercase tracking-widest ${new Date(item.expiryDate) < new Date() ? 'text-rose-500' : 'text-slate-400'}`}>
-                    Exp: {new Date(item.expiryDate).toLocaleDateString()}
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${
+                    !item.expiryDate ? 'text-slate-400' :
+                    new Date(item.expiryDate) < new Date() ? 'text-rose-500' : 'text-slate-400'
+                  }`}>
+                    Exp: {item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : "Not Set"}
                   </span>
                 </div>
                 <h3 className="text-3xl font-black premium-gradient-text mb-1">

@@ -198,7 +198,7 @@ export default function ManageCamps() {
                 disabled={loading}
                 className="w-full py-5 bg-primary text-white rounded-[2rem] font-black uppercase tracking-widest shadow-2xl shadow-primary/40 hover:-translate-y-1 transition-all disabled:opacity-50"
               >
-                {loading ? "Creating..." : "Launch Camp 🚀"}
+                {loading ? "Creating..." : "Submit Camp"}
               </button>
             </form>
           </div>

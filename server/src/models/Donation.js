@@ -91,6 +91,11 @@ const donationSchema = new mongoose.Schema(
       required: true,
     },
     
+    testerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
     testResult: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "BloodTest",

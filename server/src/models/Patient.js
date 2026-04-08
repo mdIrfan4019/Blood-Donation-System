@@ -17,6 +17,7 @@ const patientSchema = new mongoose.Schema(
       required: true,
     },
     isBlocked: { type: Boolean, default: false },
+    isAssignedBlood: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

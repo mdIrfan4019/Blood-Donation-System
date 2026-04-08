@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/auth/Login";
@@ -31,9 +32,9 @@ export default function App() {
   const { role } = useSelector((s) => s.auth);
 
   return (
-    <>
-      {/* ✅ Navbar will appear only after login */}
-      {role && <Navbar />}
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-grow">
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -192,6 +193,8 @@ export default function App() {
           }
         />
       </Routes>
-    </>
+      </main>
+      <Footer />
+    </div>
   );
 }

@@ -19,6 +19,21 @@ export const fetchHospitalRequests = createAsyncThunk(
 );
 
 /* ===========================
+   FETCH TESTING HISTORY (LAB)
+=========================== */
+export const fetchTestingHistoryThunk = createAsyncThunk(
+  "hospital/fetchTestingHistory",
+  async (_, thunkAPI) => {
+    try {
+      const res = await apiNode.get("/hospital/lab/history");
+      return res.data;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e.response?.data?.message || "Failed to fetch testing history");
+    }
+  }
+);
+
+/* ===========================
    FETCH INVENTORY FOR REQUEST (COMPATIBILITY)
    GET /api/hospital/inventory/:bloodGroup
 =========================== */
@@ -127,6 +142,22 @@ export const approveDonationThunk = createAsyncThunk(
       return res.data;
     } catch (e) {
       return thunkAPI.rejectWithValue(e.response?.data?.message || "Failed to approve donation");
+    }
+  }
+);
+
+/* ===========================
+   DONATION CLAIMING
+=========================== */
+export const claimDonationThunk = createAsyncThunk(
+  "hospital/claimDonation",
+  async (donationId, thunkAPI) => {
+    try {
+      const res = await apiNode.patch(`/hospital/donation/claim/${donationId}`);
+      thunkAPI.dispatch(fetchHospitalRequests());
+      return res.data;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e.response?.data?.message || "Failed to claim donation");
     }
   }
 );
@@ -273,6 +304,7 @@ const hospitalSlice = createSlice({
     camps: [],
     staff: [],
     doctorRequests: [],
+    testingHistory: [],
   },
 
   reducers: {
@@ -462,7 +494,22 @@ const hospitalSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
+      /* ===========================
+         DONATION CLAIMING
+      =========================== */
+      .addCase(claimDonationThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = null;
+      })
+      .addCase(claimDonationThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = "Donation claimed successfully! 🔬";
+      })
+      .addCase(claimDonationThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       /* ===========================
          LAB TESTING
       =========================== */
@@ -555,6 +602,21 @@ const hospitalSlice = createSlice({
         state.success = action.payload.message || "Blood handover completed! ✅";
       })
       .addCase(completeRequestThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      /* ===========================
+         FETCH TESTING HISTORY (LAB)
+      =========================== */
+      .addCase(fetchTestingHistoryThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTestingHistoryThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.testingHistory = action.payload;
+      })
+      .addCase(fetchTestingHistoryThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

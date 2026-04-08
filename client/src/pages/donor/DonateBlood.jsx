@@ -8,6 +8,7 @@ import {
 } from "../../store/slices/donorSlice";
 import { useNavigate } from "react-router-dom";
 import apiNode from "../../services/apiNode";
+import { statesAndDistricts } from "../../data/indiaData";
 
 export default function DonateBlood() {
   const dispatch = useDispatch();
@@ -68,6 +69,11 @@ export default function DonateBlood() {
       fetchEntities();
     }
   }, [filter]);
+
+  const handleStateChange = (e) => {
+    const state = e.target.value;
+    setFilter(prev => ({ ...prev, state, district: "" }));
+  };
 
   useEffect(() => {
     if (success) {
@@ -192,29 +198,34 @@ const handleCheckAI = () => {
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">
                     State
                   </label>
-                  <input
+                  <select
                     required
                     value={filter.state}
-                    onChange={(e) =>
-                      setFilter({ ...filter, state: e.target.value })
-                    }
-                    className="input-field w-full"
-                    placeholder="Enter State"
-                  />
+                    onChange={handleStateChange}
+                    className="input-field w-full appearance-none px-6 py-4"
+                  >
+                    <option value="" disabled>Select State</option>
+                    {Object.keys(statesAndDistricts).map(state => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">
                     District
                   </label>
-                  <input
+                  <select
                     required
                     value={filter.district}
-                    onChange={(e) =>
-                      setFilter({ ...filter, district: e.target.value })
-                    }
-                    className="input-field w-full"
-                    placeholder="Enter District"
-                  />
+                    onChange={(e) => setFilter({ ...filter, district: e.target.value })}
+                    className="input-field w-full appearance-none px-6 py-4 disabled:opacity-50"
+                    disabled={!filter.state}
+                  >
+                    <option value="" disabled>Select District</option>
+                    {filter.state && statesAndDistricts[filter.state].map(district => (
+                      <option key={district} value={district}>{district}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -485,7 +496,7 @@ const handleCheckAI = () => {
                   type="button"
                   onClick={nextStep}
                   disabled={eligibility?.status !== "Eligible"}
-                  className="w-full py-5 bg-primary text-white rounded-[2rem] font-black uppercase tracking-widest shadow-xl shadow-primary/30 disabled:opacity-30 disabled:grayscale transition-all"
+                  className="w-full py-5 bg-gradient-to-r from-red-600 to-rose-500 text-white rounded-[2rem] font-black uppercase tracking-widest shadow-xl shadow-red-500/30 disabled:opacity-30 disabled:grayscale transition-all"
                 >
                   Proceed to Final Step →
                 </button>
@@ -552,7 +563,7 @@ const handleCheckAI = () => {
                   disabled={
                     donationLoading || eligibility?.status !== "Eligible"
                   }
-                  className="w-full py-6 bg-primary text-white rounded-[2rem] font-black uppercase tracking-[0.4em] text-[12px] shadow-2xl shadow-primary/50 hover:-translate-y-1 transition-all active:scale-[0.98] disabled:opacity-50"
+                  className="w-full py-6 bg-gradient-to-r from-red-600 to-rose-500 text-white rounded-[2rem] font-black uppercase tracking-[0.4em] text-[12px] shadow-2xl shadow-red-500/50 hover:-translate-y-1 transition-all active:scale-[0.98] disabled:opacity-50"
                 >
                   {donationLoading
                     ? "Processing..."

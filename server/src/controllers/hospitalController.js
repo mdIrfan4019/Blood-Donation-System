@@ -142,6 +142,33 @@ export const approveDonation = async (req, res) => {
 };
 
 /* ======================================================
+   CLAIM DONATION FOR TESTING
+   PATCH /api/hospital/donation/claim/:id
+====================================================== */
+export const claimDonation = async (req, res) => {
+  try {
+    const donation = await Donation.findById(req.params.id);
+    if (!donation) return res.status(404).json({ message: "Donation not found" });
+
+    if (donation.status !== "testing") {
+      return res.status(400).json({ message: "Donation is not in testing status" });
+    }
+
+    if (donation.testerId) {
+      return res.status(400).json({ message: "Donation already claimed by another tester" });
+    }
+
+    donation.testerId = req.user._id;
+    await donation.save();
+
+    res.json({ message: "Donation successfully claimed for screening", donation });
+  } catch (error) {
+    console.error("Claim Donation Error:", error);
+    res.status(500).json({ message: "Failed to claim donation" });
+  }
+};
+
+/* ======================================================
    SUBMIT TEST RESULTS (Tester Role)
    POST /api/hospital/lab/test
 ====================================================== */
@@ -151,6 +178,11 @@ export const submitTestResults = async (req, res) => {
     const donation = await Donation.findById(donationId);
     
     if (!donation) return res.status(404).json({ message: "Donation not found" });
+
+    // Enforce tester assignment
+    if (donation.testerId && donation.testerId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Only the assigned tester can submit results for this donation" });
+    }
 
     // Prevent duplicate tests
     const existingTest = await BloodTest.findOne({ donation: donationId });
@@ -178,8 +210,12 @@ export const submitTestResults = async (req, res) => {
       // Add to inventory with components split (Plasma, Platelets, RBC)
       const components = ["Plasma", "Platelets", "RBC"];
       const temps = { "Plasma": "-30°C", "Platelets": "22°C", "RBC": "4°C" };
+      const shelfLives = { "Plasma": 365, "Platelets": 5, "RBC": 42 };
 
       for (const comp of components) {
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + shelfLives[comp]);
+
         await Inventory.findOneAndUpdate(
           { 
             hospitalId: donation.hospitalId, 
@@ -188,7 +224,10 @@ export const submitTestResults = async (req, res) => {
           },
           { 
             $inc: { unitsAvailable: donation.units },
-            $set: { temperature: temps[comp] }
+            $set: { 
+              temperature: temps[comp],
+              expiryDate: expiryDate
+            }
           },
           { upsert: true, new: true }
         );
@@ -232,13 +271,31 @@ export const registerPatient = async (req, res) => {
    POST /api/hospital/doctor/request
 ====================================================== */
 export const requestBlood = async (req, res) => {
+  let lockAcquired = false;
+  const { patientId, bloodGroup, component, units } = req.body;
+  
   try {
-    const { patientId, bloodGroup, component, units } = req.body;
     const hospitalId = req.user.hospitalId || req.user._id;
+
+    // 1. ATOMIC LOCK: Try to claim the assignment slot for this patient
+    const patientRecord = await Patient.findOneAndUpdate(
+      { _id: patientId, hospitalId, isAssignedBlood: false, isBlocked: false },
+      { $set: { isAssignedBlood: true } },
+      { new: true }
+    );
+
+    if (!patientRecord) {
+      return res.status(400).json({ 
+        message: "Assignment Denied: Patient either already has an active blood request, is not found, or is currently on hold." 
+      });
+    }
+    lockAcquired = true;
 
     // Get allowed donor groups for the requested blood group
     const allowedGroups = compatibility[bloodGroup];
     if (!allowedGroups) {
+      // Revert lock if invalid input
+      await Patient.findByIdAndUpdate(patientId, { $set: { isAssignedBlood: false } });
       return res.status(400).json({ message: "Invalid blood group requested" });
     }
 
@@ -248,7 +305,7 @@ export const requestBlood = async (req, res) => {
       bloodGroup: { $in: allowedGroups },
       component,
       unitsAvailable: { $gt: 0 }
-    }).sort({ bloodGroup: 1 }); // Sort to prioritize exact match if possible (alphabetical order might not be perfect for priority, but let's try to be smart)
+    }).sort({ bloodGroup: 1 });
 
     // Sort to ensure exact match comes first
     compatibleInventory.sort((a, b) => {
@@ -260,6 +317,8 @@ export const requestBlood = async (req, res) => {
     const totalAvailable = compatibleInventory.reduce((sum, item) => sum + item.unitsAvailable, 0);
 
     if (totalAvailable < units) {
+      // Revert lock if insufficient inventory
+      await Patient.findByIdAndUpdate(patientId, { $set: { isAssignedBlood: false } });
       return res.status(400).json({ message: `Insufficient stock. Required: ${units}, Available: ${totalAvailable} (Compatible with ${bloodGroup})` });
     }
 
@@ -274,7 +333,7 @@ export const requestBlood = async (req, res) => {
       status: "approved",
     });
 
-    // Deduct units from inventory (potentially from multiple compatible batches/groups)
+    // Deduct units from inventory
     let unitsToDeduct = units;
     for (const item of compatibleInventory) {
       if (unitsToDeduct <= 0) break;
@@ -288,6 +347,10 @@ export const requestBlood = async (req, res) => {
     res.status(201).json({ message: "Blood request approved and units assigned to patient", request });
   } catch (error) {
     console.error("Blood Request Error:", error);
+    // 2. SAFETY REVERSION: Release lock if an unexpected error occurs during the process
+    if (lockAcquired) {
+       await Patient.findByIdAndUpdate(patientId, { $set: { isAssignedBlood: false } });
+    }
     res.status(500).json({ message: "Failed to process blood request" });
   }
 };
@@ -324,6 +387,10 @@ export const completeBloodRequest = async (req, res) => {
     const request = await BloodRequest.findById(req.params.id);
     if (!request) return res.status(404).json({ message: "Request not found" });
 
+    if (request.status === "completed") {
+      return res.status(400).json({ message: "Request is already completed" });
+    }
+
     // Validate ownership or hospital association
     const hId = req.user.hospitalId || req.user._id;
     const isOwner = request.requester.toString() === req.user._id.toString();
@@ -336,6 +403,9 @@ export const completeBloodRequest = async (req, res) => {
     request.status = "completed";
     request.completedAt = new Date();
     await request.save();
+
+    // 3. RELEASE LOCK: Set patient.isAssignedBlood to false upon completion
+    await Patient.findByIdAndUpdate(request.patient, { $set: { isAssignedBlood: false } });
 
     res.json({ message: "Blood handout confirmed and request marked as completed", request });
   } catch (error) {
@@ -739,6 +809,26 @@ export const blockPatient = async (req, res) => {
     res.json({ message: "Patient blocked successfully", patient });
   } catch (error) {
     res.status(500).json({ message: "Failed to block patient" });
+  }
+};
+
+/* ======================================================
+   GET TESTING HISTORY (LAB TESTER)
+   GET /api/hospital/lab/history
+====================================================== */
+export const getTestingHistory = async (req, res) => {
+  try {
+    const history = await BloodTest.find({ testedBy: req.user._id })
+      .populate({
+        path: "donation",
+        populate: { path: "donor", select: "name email phone" }
+      })
+      .sort({ testedAt: -1 });
+
+    res.json(history);
+  } catch (error) {
+    console.error("Fetch Testing History Error:", error);
+    res.status(500).json({ message: "Failed to fetch testing history" });
   }
 };
 

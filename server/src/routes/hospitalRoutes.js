@@ -28,7 +28,9 @@ import {
   unblockNetworkUser,
   deletePatient,
   blockPatient,
-  unblockPatient
+  unblockPatient,
+  claimDonation,
+  getTestingHistory
 } from "../controllers/hospitalController.js";
 import { upsertHospitalProfile, getHospitalProfile } from "../controllers/hospitalProfileController.js";
 
@@ -51,7 +53,9 @@ router.get("/staff", protect, allowRoles("hospital"), getStaff);
 
 // New Workflows
 router.patch("/donation/approve/:id", protect, allowRoles("hospital"), approveDonation);
+router.patch("/donation/claim/:id", protect, allowRoles("tester", "hospital"), claimDonation);
 router.post("/lab/test", protect, allowRoles("tester", "hospital"), submitTestResults);
+router.get("/lab/history", protect, allowRoles("tester", "hospital"), getTestingHistory);
 router.post("/patient/register", protect, allowRoles("hospital", "receptionist"), registerPatient);
 router.get("/patients", protect, allowRoles("hospital", "doctor", "receptionist"), getPatients);
 router.post("/doctor/request", protect, allowRoles("doctor", "hospital"), requestBlood);

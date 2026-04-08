@@ -19,18 +19,29 @@ export default function Navbar() {
         {/* Brand */}
         <div
           className="flex items-center space-x-3 cursor-pointer group"
-          onClick={() => role && navigate(`/${role}`)}
+          onClick={() => {
+             if (role) navigate(`/${role}`);
+             else navigate('/');
+          }}
         >
-          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner">
+          <div className="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner">
             🩸
           </div>
-          <h2 className="text-xl font-black tracking-tight premium-gradient-text">
+          <h2 className="text-xl font-black tracking-tight text-rose-600 dark:text-rose-500">
             Drop4Life
           </h2>
         </div>
 
         {/* Navigation Links */}
         <div className="hidden md:flex items-center space-x-8">
+           {!role && (
+             <>
+               <PublicNavLink href="#features" label="Platform" />
+               <PublicNavLink href="#how" label="Process" />
+               <PublicNavLink href="#docs" label="Knowledge" />
+               <PublicNavLink href="#testimonials" label="Stories" />
+             </>
+           )}
            {role === "donor" && (
              <>
                <NavLink onClick={() => navigate("/donor")} label="Dashboard" />
@@ -50,7 +61,8 @@ export default function Navbar() {
            {role === "doctor" && (
              <>
                <NavLink onClick={() => navigate("/doctor")} label="Patient Requests" />
-               <NavLink onClick={() => navigate("/hospital")} label="Inventory" />
+               <NavLink onClick={() => navigate("/doctor?view=handover")} label="Handover" />
+               <NavLink onClick={() => navigate("/doctor?view=history")} label="History" />
              </>
            )}
            {role === "tester" && (
@@ -93,12 +105,20 @@ export default function Navbar() {
               Sign Out
             </button>
           ) : (
-            <button
-              onClick={() => navigate("/login")}
-              className="btn-primary px-8 py-2.5 rounded-xl font-bold text-sm"
-            >
-              Login
-            </button>
+             <div className="flex items-center gap-4">
+                <button
+                  onClick={() => navigate("/login")}
+                  className="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors uppercase tracking-widest"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => navigate("/register")}
+                  className="bg-gradient-to-r from-red-600 to-rose-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-xl shadow-red-500/20 hover:-translate-y-1 hover:shadow-2xl transition-all uppercase tracking-widest"
+                >
+                  Join Us
+                </button>
+             </div>
           )}
         </div>
       </div>
@@ -110,10 +130,22 @@ function NavLink({ onClick, label }) {
   return (
     <button 
       onClick={onClick}
-      className="text-sm font-bold text-slate-500 hover:text-primary transition-colors uppercase tracking-widest relative group"
+      className="text-sm font-bold text-slate-500 hover:text-rose-500 transition-colors uppercase tracking-widest relative group"
     >
       {label}
-      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-rose-500 transition-all group-hover:w-full" />
     </button>
   );
+}
+
+function PublicNavLink({ href, label }) {
+    return (
+      <a 
+        href={href}
+        className="text-sm font-bold text-slate-500 hover:text-rose-500 transition-colors uppercase tracking-widest relative group"
+      >
+        {label}
+        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-rose-500 transition-all group-hover:w-full" />
+      </a>
+    );
 }

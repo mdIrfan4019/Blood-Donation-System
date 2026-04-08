@@ -82,44 +82,50 @@ export default function Requests() {
   /* ===========================
      FILTERS
   =========================== */
-  const pendingRequests = requests.filter((r) => r.status === "pending" && !r.donationType);
-  const pendingDonations = requests.filter((r) => r.status === "pending" && r.donationType);
-  const completedRecords = requests.filter((r) => r.status === "completed" || r.status === "safe");
+  const donationsList = requests.filter((r) => r.donationType && r.status === "pending");
+  const processedDonations = requests.filter((r) => r.donationType && r.status !== "pending");
+  const patientRequests = requests.filter((r) => !r.donationType);
 
   /* ===========================
      RENDER CARD
   =========================== */
-  const renderRequestCard = (r, showAction = false, isDonation = false) => {
+  const renderRequestCard = (r, isDonation = false) => {
     if (isDonation) {
+      const isPending = r.status === "pending";
       return (
         <div key={r._id} className="glass-card p-8 rounded-[2.5rem] group hover:border-primary/30 transition-all relative overflow-hidden">
-           <div className="flex justify-between items-start mb-6">
-              <div>
-                <span className="px-4 py-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-sm font-black rounded-xl border border-blue-200 dark:border-blue-800/50">
-                  DONATION: {r.bloodGroup}
-                </span>
-                <h3 className="text-2xl font-black mt-3 text-slate-800 dark:text-slate-100">
-                  {r.donor?.name || "New Donor"}
-                </h3>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
-                  Method: {r.donationType} • {r.state}, {r.district}
-                </p>
-              </div>
-           </div>
-           <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 text-[10px] font-bold uppercase tracking-widest">
-                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">Hb: {r.eligibility?.hb}</div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">BP: {r.eligibility?.bp}</div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">Age: {r.eligibility?.age}</div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">Wt: {r.eligibility?.weight}kg</div>
-              </div>
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <span className={`px-4 py-1.5 text-sm font-black rounded-xl border ${r.status === 'safe' ? 'bg-emerald-100 text-emerald-600 border-emerald-200' :
+                  r.status === 'testing' ? 'bg-blue-100 text-blue-600 border-blue-200' :
+                    'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800/50'
+                }`}>
+                DONATION: {r.bloodGroup} {r.status !== 'pending' && `• ${r.status.toUpperCase()}`}
+              </span>
+              <h3 className="text-2xl font-black mt-3 text-slate-800 dark:text-slate-100">
+                {r.donor?.name || "New Donor"}
+              </h3>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
+                Method: {r.donationType} • {r.state}, {r.district}
+              </p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3 text-[10px] font-bold uppercase tracking-widest">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">Hb: {r.eligibility?.hb}</div>
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">BP: {r.eligibility?.bp}</div>
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">Age: {r.eligibility?.age}</div>
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">Wt: {r.eligibility?.weight}kg</div>
+            </div>
+            {isPending && (
               <button
                 onClick={() => handleApproveDonation(r._id)}
                 className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-900/30 hover:-translate-y-1 transition-all"
               >
                 Approve for Testing 🔬
               </button>
-           </div>
+            )}
+          </div>
         </div>
       );
     }
@@ -132,8 +138,9 @@ export default function Requests() {
       <div key={r._id} className="glass-card p-8 rounded-[2.5rem] group hover:border-primary/30 transition-all relative overflow-hidden">
         <div className="flex justify-between items-start mb-6">
           <div>
-            <span className="px-4 py-1.5 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-sm font-black rounded-xl border border-red-200 dark:border-red-800/50">
-              {r.bloodGroup}
+            <span className={`px-4 py-1.5 text-sm font-black rounded-xl border ${r.status === 'completed' ? 'bg-emerald-100 text-emerald-600 border-emerald-200' : 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50'
+              }`}>
+              {r.bloodGroup} {r.status === 'completed' && "• COMPLETED"}
             </span>
             <h3 className="text-2xl font-black mt-3 text-slate-800 dark:text-slate-100">
               {r.units} Units Required
@@ -141,10 +148,13 @@ export default function Requests() {
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
               {r.component || "Whole Blood"} • {r.urgency || "Standard"}
             </p>
+            <p className="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-widest">
+              Patient: {r.patient?.name || "N/A"}
+            </p>
           </div>
-          {r.status !== "pending" && (
+          {r.status === "completed" && (
             <span className="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest">
-              Completed
+              Delivered
             </span>
           )}
         </div>
@@ -160,7 +170,7 @@ export default function Requests() {
               </div>
               <span className="text-2xl">{canFulfill ? "✅" : "⚠️"}</span>
             </div>
-            
+
             <button
               onClick={() => handleFulfill(r._id)}
               disabled={!canFulfill || loading}
@@ -175,11 +185,11 @@ export default function Requests() {
   };
 
   const currentList =
-    activeTab === "pending"
-      ? pendingRequests
-      : activeTab === "donations"
-      ? pendingDonations
-      : completedRecords;
+    activeTab === "donations"
+      ? donationsList
+      : activeTab === "completed"
+        ? processedDonations
+        : patientRequests;
 
   return (
     <div className="">
@@ -194,23 +204,23 @@ export default function Requests() {
         </div>
 
         <div className="flex p-1 bg-slate-200 dark:bg-slate-800 rounded-2xl w-fit shadow-inner">
-          {/* <button
-            onClick={() => setActiveTab("pending")}
-            className={`px-6 py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all ${activeTab === "pending" ? 'bg-white dark:bg-slate-700 text-orange-500 shadow-sm' : 'text-slate-500'}`}
-          >
-            ⏳ Requests ({pendingRequests.length})
-          </button> */}
           <button
             onClick={() => setActiveTab("donations")}
             className={`px-6 py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all ${activeTab === "donations" ? 'bg-white dark:bg-slate-700 text-blue-500 shadow-sm' : 'text-slate-500'}`}
           >
-            🩸 Donations ({pendingDonations.length})
+            🩸 Donations ({donationsList.length})
           </button>
           <button
             onClick={() => setActiveTab("completed")}
-            className={`px-6 py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all ${activeTab === "completed" ? 'bg-white dark:bg-slate-700 text-emerald-500 shadow-sm' : 'text-slate-500'}`}
+            className={`px-6 py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all ${activeTab === "completed" ? 'bg-white dark:bg-slate-700 text-orange-500 shadow-sm' : 'text-slate-500'}`}
           >
-            ✅ Completed ({completedRecords.length})
+            🧪 Processed ({processedDonations.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("patient")}
+            className={`px-6 py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all ${activeTab === "patient" ? 'bg-white dark:bg-slate-700 text-emerald-500 shadow-sm' : 'text-slate-500'}`}
+          >
+            📦 Given to Patient ({patientRequests.length})
           </button>
         </div>
       </div>
@@ -223,12 +233,12 @@ export default function Requests() {
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-        {currentList.map((r) => renderRequestCard(r, activeTab === "pending", activeTab === "donations"))}
+        {currentList.map((r) => renderRequestCard(r, activeTab === "donations" || activeTab === "completed"))}
       </div>
 
       {!loading && currentList.length === 0 && (
         <div className="text-center py-32 glass-card rounded-[3rem]">
-          <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">No records found</p>
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">No records found for this category</p>
         </div>
       )}
     </div>

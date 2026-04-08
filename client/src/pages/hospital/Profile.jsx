@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchHospitalProfile, updateHospitalProfile, clearHospitalStatus } from "../../store/slices/hospitalSlice";
+import { statesAndDistricts } from "../../data/indiaData";
 
 export default function HospitalProfile() {
   const dispatch = useDispatch();
@@ -53,7 +54,11 @@ export default function HospitalProfile() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === "state") {
+      setFormData(prev => ({ ...prev, state: value, district: "" }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   return (
@@ -208,25 +213,34 @@ export default function HospitalProfile() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="label-text">State</label>
-                  <input
+                  <select
                     name="state"
                     value={formData.state}
                     onChange={handleChange}
                     className="input-field"
-                    placeholder="e.g. Maharashtra"
                     required
-                  />
+                  >
+                    <option value="">Select State</option>
+                    {Object.keys(statesAndDistricts).map(state => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="label-text">District</label>
-                  <input
+                  <select
                     name="district"
                     value={formData.district}
                     onChange={handleChange}
                     className="input-field"
-                    placeholder="e.g. Mumbai"
                     required
-                  />
+                    disabled={!formData.state}
+                  >
+                    <option value="">Select District</option>
+                    {formData.state && statesAndDistricts[formData.state]?.map(district => (
+                      <option key={district} value={district}>{district}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
