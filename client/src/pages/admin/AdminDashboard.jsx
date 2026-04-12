@@ -245,21 +245,21 @@ export default function AdminDashboard() {
   }, [dispatch]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 sm:p-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 sm:p-10">
       {/* Header */}
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-4xl font-extrabold premium-gradient-text tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold premium-gradient-text tracking-tight text-center md:text-left">
             Admin Management 🛡️
           </h2>
-          <p className="text-slate-500 font-medium mt-1">
+          <p className="text-slate-500 font-medium mt-1 text-center md:text-left text-sm sm:text-base">
             System pulse, critical alerts, and global operations
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center md:justify-end gap-3">
            <div className="px-4 py-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-2">
-             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-             <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">System Live</span>
+             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">System Live</span>
            </div>
         </div>
       </div>

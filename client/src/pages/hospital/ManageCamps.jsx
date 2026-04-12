@@ -55,17 +55,17 @@ export default function ManageCamps() {
     <div className="">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-          <div>
-            <h2 className="text-4xl font-extrabold premium-gradient-text tracking-tight">
+          <div className="text-center md:text-left">
+            <h2 className="text-2xl sm:text-4xl font-extrabold premium-gradient-text tracking-tight">
               Blood Donation Camps ⛺
             </h2>
-            <p className="text-slate-500 font-medium mt-1">
+            <p className="text-slate-500 font-medium mt-1 text-sm sm:base">
               Organize and track your community blood donation drives.
             </p>
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="btn-primary px-8 py-4 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:-translate-y-1 transition-all flex items-center gap-2"
+            className="btn-primary w-full md:w-auto px-8 py-4 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
           >
             <span className="text-xl">+</span> Organize New Camp
           </button>
@@ -76,24 +76,24 @@ export default function ManageCamps() {
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
             {camps.map((camp) => (
-              <div key={camp._id} className="glass-card p-8 rounded-[2.5rem] group hover:border-primary/30 transition-all relative overflow-hidden">
-                <div className={`absolute top-0 right-0 px-6 py-2 rounded-bl-3xl text-[10px] font-black uppercase tracking-widest ${camp.status === 'active' ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'}`}>
+              <div key={camp._id} className="glass-card p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] group hover:border-primary/30 transition-all relative overflow-hidden">
+                <div className={`absolute top-0 right-0 px-4 sm:px-6 py-2 rounded-bl-2xl sm:rounded-bl-3xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest ${camp.status === 'active' ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'}`}>
                   {camp.status}
                 </div>
-                <h3 className="text-2xl font-black mb-1 mt-4">{camp.name}</h3>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">
+                <h3 className="text-xl sm:text-2xl font-black mb-1 mt-4">{camp.name}</h3>
+                <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">
                   📍 {camp.district}, {camp.state}
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
                     <span className="w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">📅</span>
-                    <span>{new Date(camp.startDate).toLocaleDateString()} — {new Date(camp.endDate).toLocaleDateString()}</span>
+                    <span className="text-xs sm:text-sm">{new Date(camp.startDate).toLocaleDateString()} — {new Date(camp.endDate).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                     <span className="w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center shrink-0">🏠</span>
-                    <span>{camp.address}</span>
+                    <span className="text-xs sm:text-sm">{camp.address}</span>
                   </div>
                 </div>
               </div>
@@ -102,9 +102,9 @@ export default function ManageCamps() {
         )}
 
         {!loading && camps.length === 0 && (
-          <div className="text-center py-32 glass-card rounded-[3rem] border-dashed border-2 border-slate-200 dark:border-slate-800">
-            <div className="text-6xl mb-6 opacity-20">⛺</div>
-            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No camps organized yet</p>
+          <div className="text-center py-24 sm:py-32 glass-card rounded-[2rem] sm:rounded-[3rem] border-dashed border-2 border-slate-200 dark:border-slate-800">
+            <div className="text-5xl sm:text-6xl mb-6 opacity-20">⛺</div>
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] sm:text-xs">No camps organized yet</p>
           </div>
         )}
       </div>
@@ -112,21 +112,21 @@ export default function ManageCamps() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="glass-card w-full max-w-2xl p-10 rounded-[3rem] shadow-2xl relative animate-in zoom-in-95 duration-300 overflow-y-auto max-h-[90vh]">
+          <div className="glass-card w-full max-w-2xl p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-2xl relative animate-in zoom-in-95 duration-300 overflow-y-auto max-h-[90vh]">
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-8 right-8 text-2xl text-slate-400 hover:text-rose-500 transition-colors"
+              className="absolute top-6 right-6 sm:top-8 sm:right-8 text-xl sm:text-2xl text-slate-400 hover:text-rose-500 transition-colors"
             >
               ✕
             </button>
-            <h2 className="text-3xl font-black mb-2 premium-gradient-text">Organize Camp 🩸</h2>
-            <p className="text-slate-500 mb-8 font-medium">Create a new blood donation drive in your area.</p>
+            <h2 className="text-2xl sm:text-3xl font-black mb-2 premium-gradient-text">Organize Camp 🩸</h2>
+            <p className="text-slate-500 mb-6 sm:mb-8 font-medium text-sm sm:text-base">Create a new blood donation drive in your area.</p>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               {error && <div className="p-4 bg-rose-50 text-rose-600 rounded-2xl text-sm font-bold border border-rose-100">{error}</div>}
               
               <div className="space-y-2">
-                <label className="label-text ml-4">Camp Name</label>
+                <label className="label-text ml-2 sm:ml-4">Camp Name</label>
                 <input
                   required
                   value={form.name}
@@ -136,9 +136,9 @@ export default function ManageCamps() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-2">
-                  <label className="label-text ml-4">State</label>
+                  <label className="label-text ml-2 sm:ml-4">State</label>
                   <input
                     required
                     value={form.state}
@@ -148,7 +148,7 @@ export default function ManageCamps() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="label-text ml-4">District</label>
+                  <label className="label-text ml-2 sm:ml-4">District</label>
                   <input
                     required
                     value={form.district}
@@ -160,19 +160,19 @@ export default function ManageCamps() {
               </div>
 
               <div className="space-y-2">
-                <label className="label-text ml-4">Address Details</label>
+                <label className="label-text ml-2 sm:ml-4">Address Details</label>
                 <textarea
                   required
                   value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
-                  className="input-field min-h-[100px]"
+                  className="input-field min-h-[80px] sm:min-h-[100px]"
                   placeholder="Street, Landmark, City..."
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-2">
-                  <label className="label-text ml-4">Start Date</label>
+                  <label className="label-text ml-2 sm:ml-4">Start Date</label>
                   <input
                     type="date"
                     required
@@ -182,7 +182,7 @@ export default function ManageCamps() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="label-text ml-4">End Date</label>
+                  <label className="label-text ml-2 sm:ml-4">End Date</label>
                   <input
                     type="date"
                     required
@@ -196,7 +196,7 @@ export default function ManageCamps() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-5 bg-primary text-white rounded-[2rem] font-black uppercase tracking-widest shadow-2xl shadow-primary/40 hover:-translate-y-1 transition-all disabled:opacity-50"
+                className="w-full py-4 sm:py-5 bg-primary text-white rounded-[1.5rem] sm:rounded-[2rem] font-black uppercase tracking-widest shadow-2xl shadow-primary/40 hover:-translate-y-1 transition-all disabled:opacity-50 text-sm sm:text-base"
               >
                 {loading ? "Creating..." : "Submit Camp"}
               </button>

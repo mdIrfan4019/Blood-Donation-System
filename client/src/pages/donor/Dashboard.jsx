@@ -61,7 +61,7 @@ const { dashboard, dashboardLoading, error } = useSelector((s) => s.donor);
       {/* Header */}
       <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-4xl font-extrabold premium-gradient-text tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold premium-gradient-text tracking-tight">
             Donor Dashboard 🩸
           </h2>
           <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">
@@ -142,20 +142,20 @@ const { dashboard, dashboardLoading, error } = useSelector((s) => s.donor);
       {/* Donation History */}
       {dashboard?.donations?.length > 0 && (
         <div className="mt-16">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold">Donation Journey 📋</h3>
-            <span className="text-sm text-slate-500">{dashboard.donations.length} records found</span>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6">
+            <h3 className="text-xl sm:text-2xl font-bold">Donation Journey 📋</h3>
+            <span className="text-xs sm:text-sm text-slate-500">{dashboard.donations.length} records found</span>
           </div>
 
-          <div className="glass-card rounded-3xl overflow-hidden">
-            <table className="w-full">
+          <div className="responsive-table-container">
+            <table className="w-full min-w-[700px]">
               <thead>
-                <tr className="bg-slate-100/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-                  <th className="p-4 text-left text-sm font-bold text-slate-600 dark:text-slate-400">Date</th>
-                  <th className="p-4 text-left text-sm font-bold text-slate-600 dark:text-slate-400">Blood Group</th>
-                  <th className="p-4 text-left text-sm font-bold text-slate-600 dark:text-slate-400">Units</th>
-                  <th className="p-4 text-left text-sm font-bold text-slate-600 dark:text-slate-400">Location</th>
-                  <th className="p-4 text-left text-sm font-bold text-slate-600 dark:text-slate-400">Action</th>
+                <tr className="bg-slate-100/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                  <th className="p-4 text-left text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Date</th>
+                  <th className="p-4 text-left text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Blood Group</th>
+                  <th className="p-4 text-left text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Units</th>
+                  <th className="p-4 text-left text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Location</th>
+                  <th className="p-4 text-left text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
