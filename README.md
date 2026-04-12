@@ -5,6 +5,7 @@
 [![Production Ready](https://img.shields.io/badge/Status-Production--Ready-emerald.svg?style=for-the-badge)]()
 [![Tech Stack](https://img.shields.io/badge/Architecture-MERN--AI-rose.svg?style=for-the-badge)]()
 [![AI Powered](https://img.shields.io/badge/Engine-Python--Forecasting-blue.svg?style=for-the-badge)]()
+[![Live Demo](https://img.shields.io/badge/Demo-Live--Preview-orange.svg?style=for-the-badge)](https://blood-donation-system-vert.vercel.app/)
 
 ---
 
