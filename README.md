@@ -1,6 +1,6 @@
 # Drop4Life 🩸 
 
-> **Intelligence meets Humanity.** The state-of-the-art MERN + AI platform designed to eliminate blood shortages through predictive logistics and seamless human connection.
+> **Intelligence meets Humanity.** A state-of-the-art MERN + AI platform designed to eliminate blood shortages through predictive logistics, automated matching, and a seamless multi-tenant medical ecosystem.
 
 [![Production Ready](https://img.shields.io/badge/Status-Production--Ready-emerald.svg?style=for-the-badge)]()
 [![Tech Stack](https://img.shields.io/badge/Architecture-MERN--AI-rose.svg?style=for-the-badge)]()
@@ -9,90 +9,190 @@
 
 ---
 
-## 🌟 The Vision
-In the time it takes to read this sentence, someone somewhere needs a life-saving blood transfusion. Yet, blood banks often operate reactively—waiting for a crisis before calling for donors. **Drop4Life** flips the script. By integrating **Artificial Intelligence** with a robust **Logistics Network**, we transform blood donation from a manual struggle into a proactive, data-driven ecosystem.
+## 📖 Overview
+
+Drop4Life is not just a donation portal; it's a **Blood Supply Chain Management System**. By integrating **Machine Learning** with a robust **Node.js backend**, the platform transforms blood donation from a reactive manual struggle into a proactive, data-driven ecosystem. It supports multiple stakeholders including Donors, Hospitals, Doctors, Lab Testers, and Administrators.
 
 ---
 
-## 📖 For the Non-Coder: How it Works
-Imagine a world where blood flows exactly where it's needed, minutes *before* an emergency happens. That is the "Drop4Life Journey":
+## 🌟 Key Features
 
-1.  **The Donor (Sam)**: Sam signs up. Our **AI Eligibility Engine** checks his recent health history and medical rules instantly. Sam knows he’s safe to donate before he even leaves his house.
-2.  **The Hospital (LifeLine Center)**: Using our **AI Demand Forecast**, the hospital sees that "O-Negative" blood demand usually spikes during the upcoming rainy season. They organize a "Camp" through the platform *now* to prepare.
-3.  **The Matching**: A patient needs blood. Our system algorithmically scans the network, finds Sam's donation, and pairs them in seconds.
-4.  **The Impact**: Sam receives a notification: *"Your blood was just used to save a life."* The loop of humanity is closed.
+### 🧠 AI-Driven Intelligence
+- **Predictive Demand Forecasting**: Uses Linear Regression (Python/Flask) to analyze historical usage and predict future blood unit requirements for hospitals.
+- **AI Eligibility Engine**: Instant health screening for donors based on Hemoglobin (HB), BP, Age, and BMI, featuring simulated **Explainable AI (XAI)** to explain rejection/approval reasons.
 
----
+### 🏥 Hospital & Inventory Management
+- **Atomic Inventory Control**: Real-time tracking of blood bags with atomic updates to prevent double-allocation.
+- **Lab Testing Workflow**: Integrated workflow for Lab Testers to record blood test results (HIV, Hep-B, etc.) before units enter the usable inventory.
+- **Staff Management**: Hospitals can manage their own internal staff (Doctors, Testers, Receptionists).
 
-## 🛠️ For the Recruiter: Technical Architecture
-Drop4Life is built as a high-concurrency, multi-tenant system leveraging a distributed microservice architecture.
+### 🩸 Donation Ecosystem
+- **Automated Matching**: Algorithmically finds compatible donors for urgent blood requests based on blood group compatibility (e.g., O- can give to anyone).
+- **Camp Organization**: Hospitals can organize blood donation camps and donors can view/join them in real-time.
+- **Story Sharing**: A social layer where donors share their experiences to inspire the community.
 
-### High-Level System Architecture
-```mermaid
-graph TD
-    User((Users)) -->|React 19| Frontend[Vite + Tailwind Frontend]
-    Frontend -->|Redux Toolkit| State[Local State Management]
-    State -->|JWT Authenticated API| Backend[Node.js + Express Backend]
-    Backend -->|Mongoose| DB[(MongoDB Atlas)]
-    Backend -->|REST| AIService[Python Flask AI Service]
-    AIService -->|Scikit-Learn| Models[Predictive & Eligibility Models]
-    Backend -->|Nodemailer| Mail[Notification Engine]
-```
-
-### Key Technical Achievements
--   **Predictive Logistics**: Implemented a Python-based forecasting service using **Linear Regression** to predict hospital blood demand trends.
--   **Atomic Concurrency**: Backend logic ensures that a single blood bag cannot be assigned to multiple patients simultaneously, even under high request volume.
--   **Dynamic RBAC (Role-Based Access Control)**: A sophisticated permission system with **6+ distinct roles** (Admin, Hospital, Doctor, Tester, etc.), each with tailored workspaces and data access levels.
--   **Real-time UI/UX**: Developed a premium "Glassmorphism" interface using **Tailwind CSS**, featuring dark mode support and ultra-responsive layouts for mobile medical environments.
+### 🛡️ Enterprise-Grade Security
+- **Dynamic RBAC**: Role-Based Access Control with 6+ distinct roles.
+- **Secure Auth**: JWT-based authentication with high-entropy secrets and protected routes.
 
 ---
 
-## 🎭 The Human Ecosystem (Roles)
+## 🛠️ Tech Stack
 
-| Role | Responsibility | Tech Highlight |
+### Frontend (Client)
+| Technology | Version | Purpose |
 | :--- | :--- | :--- |
-| **🧛 Donor** | Contribute blood & track impact. | AI Eligibility Screening |
-| **🏥 Hospital Admin** | Manage inventory & organize camps. | AI Demand Forecasting |
-| **👨‍⚕️ Doctor** | Register patients & request blood. | Low-latency Search & Filter |
-| **🧪 Lab Tester** | Screen blood for safety & type. | Real-time Status Updates |
-| **⌨️ Receptionist** | Onboard patients and donors. | Rapid Entry OCR (Planned) |
-| **🛡️ Global Admin** | Platform health & system metrics. | Centralized Audit Logs |
+| **React** | 19.2.0 | Core UI Framework |
+| **Redux Toolkit** | 2.11.2 | Global State Management |
+| **Vite** | 7.2.4 | Build Tool / Dev Server |
+| **Tailwind CSS** | 3.4.19 | Modern utility-first styling |
+| **Recharts** | 3.7.0 | Data visualization for demand history |
+| **Framer Motion** | ^11.x | Smooth UI animations & transitions |
 
----
-
-## 💻 Tech Stack
-
-### Frontend
-- **Framework**: React 19 (Vite)
-- **State**: Redux Toolkit (Thunk)
-- **Styling**: Tailwind CSS (PostCSS)
-- **Visuals**: Recharts (Data Viz), Framer Motion (Animations)
-
-### Backend
-- **Core**: Node.js & Express.js
-- **Database**: MongoDB Atlas
-- **Auth**: JWT (JSON Web Tokens) with HttpOnly Cookies
-- **Communication**: Axois, Nodemailer
+### Backend (Server)
+| Technology | Version | Purpose |
+| :--- | :--- | :--- |
+| **Node.js** | 20.x | Runtime Environment |
+| **Express.js** | 5.2.1 | API Framework |
+| **MongoDB Atlas** | ^9.1.2 | NoSQL Cloud Database |
+| **Mongoose** | 9.1.2 | ODM for MongoDB |
+| **JWT** | 9.0.3 | Secure Token-based Authentication |
+| **Nodemailer** | 7.0.12 | Automated email notifications |
 
 ### AI Service
-- **Core**: Python 3.x
-- **Infrastructure**: Flask
-- **ML Engine**: Scikit-Learn, NumPy, Joblib
+| Technology | Version | Purpose |
+| :--- | :--- | :--- |
+| **Python** | 3.10+ | ML Processing |
+| **Flask** | 3.0.3 | Micro-service API |
+| **NumPy** | 1.26.4 | Numerical data processing |
+| **Scikit-Learn** | (Model) | Linear Regression & Forecasting logic |
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    subgraph Client_Tier [Frontend: React 19]
+        UI[User Interface]
+        Redux[Redux Toolkit State]
+        Axios[Axios Interceptors]
+    end
+
+    subgraph Logic_Tier [Backend: Express.js]
+        Auth[JWT Middleware]
+        RBAC[Role-Based Access Control]
+        Controllers[Business Logic]
+        Notify[Nodemailer Engine]
+    end
+
+    subgraph AI_Tier [Service: Flask]
+        Forecast[Demand Forecasting]
+        Eligibility[AI Health Engine]
+    end
+
+    subgraph Data_Tier [Database: MongoDB]
+        Models[(Mongoose Models)]
+    end
+
+    UI <--> Redux
+    Redux <--> Axios
+    Axios <--> Auth
+    Auth --> RBAC
+    RBAC --> Controllers
+    Controllers <--> Models
+    Controllers <--> Forecast
+    Controllers <--> Eligibility
+    Controllers --> Notify
+```
+
+---
+
+## 📂 Project Structure
+
+```text
+├── client/                 # React Frontend
+│   ├── src/
+│   │   ├── components/     # Reusable UI Components
+│   │   ├── pages/          # Page components (Role-specific subfolders)
+│   │   ├── store/          # Redux Toolkit Slices
+│   │   └── utils/          # API helpers & formatting
+├── server/                 # Express Backend
+│   ├── src/
+│   │   ├── controllers/    # Request handlers
+│   │   ├── models/         # Mongoose Schemas
+│   │   ├── routes/         # API Endpoints
+│   │   ├── middleware/     # Auth & Role guards
+│   │   └── config/         # DB & Environment config
+├── ai-service/             # Python Flask ML Service
+│   ├── app.py              # ML API Endpoints
+│   └── requirements.txt    # Python dependencies
+```
+
+---
+
+## 🔌 API Reference
+
+### Auth & User
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| POST | `/api/auth/register` | Register new user | Public |
+| POST | `/api/auth/login` | Login and get JWT | Public |
+| GET | `/api/auth/me` | Get current user data | Private |
+
+### Hospital & Medical
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| GET | `/api/hospital/inventory` | View current blood stock | Hospital/Doctor |
+| POST | `/api/hospital/inventory` | Add blood units to stock | Hospital |
+| POST | `/api/hospital/lab/test` | Submit blood safety results | Lab Tester |
+| POST | `/api/hospital/doctor/request` | Request blood for patient | Doctor |
+| GET | `/api/hospital/forecast` | Get AI demand prediction | Hospital |
+
+### Donor & Social
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| POST | `/api/eligibility/check` | Run AI eligibility check | Donor/Public |
+| POST | `/api/donor/donate` | Register for blood donation | Donor |
+| GET | `/api/stories/all` | View community impact stories | Public |
+
+*(For full list, see [Project_Report.md](./Project_Report/Project_Report.md))*
+
+---
+
+## 🛡️ Role-Based Access Control (RBAC) Matrix
+
+| Feature | Donor | Hospital | Doctor | Lab Tester | Admin |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| Donate Blood | ✅ | ❌ | ❌ | ❌ | ❌ |
+| View Inventory | ❌ | ✅ | ✅ | ❌ | ✅ |
+| Manage Staff | ❌ | ✅ | ❌ | ❌ | ❌ |
+| Submit Test Results | ❌ | ✅ | ❌ | ✅ | ❌ |
+| Request Blood | ❌ | ✅ | ✅ | ❌ | ❌ |
+| Forecast Demand | ❌ | ✅ | ❌ | ❌ | ✅ |
+| Delete Users | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 ---
 
 ## 🚀 Getting Started
 
+### Prerequisites
+- Node.js (v18+)
+- MongoDB Atlas Account
+- Python (v3.10+)
+- Git
+
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/drop4life.git
+git clone https://github.com/mdIrfan4019/Blood-Donation-System.git
+cd Blood-Donation-System
 ```
 
-### 2. Setup Backend
+### 2. Setup Server
 ```bash
 cd server
 npm install
-# Create .env with MONGO_URI, JWT_SECRET, PORT, AI_SERVICE_URL
+# Create .env (see Environment Variables section)
 npm run dev
 ```
 
@@ -107,18 +207,43 @@ python app.py
 ```bash
 cd client
 npm install
-# Create .env with VITE_API_URL
+# Create .env (VITE_API_URL=http://localhost:5000)
 npm run dev
 ```
 
 ---
 
-## 🗺️ Roadmap
-- [ ] **GPS Logistics**: Real-time tracking for blood transport vehicles.
-- [ ] **Blockchain Ledger**: Immutable history of blood bags for 100% transparency.
-- [ ] **Mobile App**: Dedicated Android/iOS apps for donors.
+## 🔐 Environment Variables
+
+### Server (`/server/.env`)
+```env
+PORT=5000
+MONGO_URI=your_mongodb_atlas_uri
+JWT_SECRET=your_jwt_secret_key
+AI_SERVICE_URL=http://localhost:8000
+EMAIL_USER=your_email
+EMAIL_PASS=your_email_password
+```
+
+### Client (`/client/.env`)
+```env
+VITE_API_URL=http://localhost:5000
+VITE_AI_SERVICE_URL=http://localhost:8000
+```
+
+---
+
+## 🗺️ Roadmap & Future Scope
+- [ ] **GPS Real-time Tracking**: Monitor blood transport vehicles via Google Maps API.
+- [ ] **Blockchain Integration**: Immutable ledger for blood bag history (100% transparency).
+- [ ] **Mobile Application**: Native React Native apps for iOS/Android.
+- [ ] **Advanced AI**: Computer Vision for automated blood bag label scanning.
 
 ---
 
 ## ❤️ Acknowledgements
-This project is dedicated to the millions of voluntary donors who keep the world's pulse beating. **Drop a Star ⭐ if you believe in the cause!**
+This project is dedicated to the voluntary donors who keep the world's pulse beating. 
+**Drop a Star ⭐ if you believe in the cause!**
+
+---
+© 2026 Drop4Life - Intelligence meets Humanity.
