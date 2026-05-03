@@ -80,13 +80,13 @@ export default function App() {
         />
 
         <Route
-          path="/donor/certificate/:donationId"
+         />   path="/donor/certificate/:donationId"
           element={
             <ProtectedRoute role="donor">
               <Certificate />
             </ProtectedRoute>
           }
-        />
+      
 
         {/* ================= HOSPITAL ROLES ================= */}
         <Route

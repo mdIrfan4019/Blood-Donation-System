@@ -63,7 +63,7 @@ router.get("/doctor/requests", protect, allowRoles("doctor", "hospital"), getDoc
 router.patch("/doctor/complete/:id", protect, allowRoles("doctor", "hospital"), completeBloodRequest);
 
 router.get("/inventory/:bloodGroup", protect, allowRoles("hospital", "doctor"), getInventoryForRequest);
-router.get("/requests", protect, allowRoles("hospital", "doctor"), viewRequests);
+router.get("/requests", protect, allowRoles("hospital", "doctor", "tester"), viewRequests);
 
 // Network
 router.get("/bloodbanks", protect, allowRoles("hospital"), getAllBloodBanks);
