@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import BloodRequest from "../models/BloodRequest.js";
 import Inventory from "../models/Inventory.js";
 import User from "../models/User.js";
@@ -586,7 +587,8 @@ export const getAllBloodBanks = async (req, res) => {
 export const getDemandHistory = async (req, res) => {
   try {
     const { bloodGroup, days = 30, type = "daily" } = req.query;
-    const hospitalId = req.user.hospitalId || req.user._id;
+    const hIdString = req.user.hospitalId || req.user._id;
+    const hospitalId = new mongoose.Types.ObjectId(hIdString);
 
     if (!bloodGroup) {
       return res.status(400).json({ message: "bloodGroup query param is required" });
@@ -650,7 +652,8 @@ export const getDemandHistory = async (req, res) => {
 export const forecastDemand = async (req, res) => {
   try {
     const { bloodGroup, days = 30, type = "daily" } = req.body;
-    const hospitalId = req.user.hospitalId || req.user._id;
+    const hIdString = req.user.hospitalId || req.user._id;
+    const hospitalId = new mongoose.Types.ObjectId(hIdString);
 
     if (!bloodGroup) {
       return res.status(400).json({ message: "bloodGroup is required" });
@@ -699,8 +702,19 @@ export const forecastDemand = async (req, res) => {
       paddedSeries.unshift(paddedSeries[0]);
     }
 
-    const forecastResult = await forecastDemandAI(paddedSeries);
-    const predictedUnits = Math.round(forecastResult.predicted_units || 0);
+    let predictedUnits = 0;
+    let isFallback = false;
+
+    try {
+      const forecastResult = await forecastDemandAI(paddedSeries);
+      predictedUnits = Math.round(forecastResult.predicted_units || 0);
+    } catch (aiError) {
+      console.error("AI Service unreachable, using fallback prediction:", aiError.message);
+      isFallback = true;
+      // Fallback: simple average of available data points
+      const sum = series.reduce((a, b) => a + b, 0);
+      predictedUnits = Math.round(sum / series.length) || 0;
+    }
 
     const inventoryAgg = await Inventory.aggregate([
       { $match: { hospitalId, bloodGroup } },
@@ -718,7 +732,11 @@ export const forecastDemand = async (req, res) => {
     res.json({
       bloodGroup, type, days: Number(days), predicted_units: predictedUnits, totalStock,
       shortage, shortageBy: shortage ? predictedUnits - totalStock : 0, history, series, chartData,
-      suggestion: shortage ? `⚠️ Predicted demand escapes local stock limit. Add ${predictedUnits - totalStock} units.` : "✅ Local stock sufficient.",
+      isFallback,
+      suggestion: shortage 
+        ? `⚠️ Predicted demand escapes local stock limit. Add ${predictedUnits - totalStock} units.` 
+        : "✅ Local stock sufficient.",
+      aiStatus: isFallback ? "Using historical average (AI service offline)" : "AI optimized prediction active"
     });
   } catch (err) {
     console.error("Forecast Error:", err);
