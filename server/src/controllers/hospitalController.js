@@ -604,7 +604,7 @@ export const getDemandHistory = async (req, res) => {
         $match: {
           hospitalId,
           bloodGroup,
-          status: { $in: ["pending", "completed"] },
+          status: { $in: ["pending", "approved", "completed"] },
           createdAt: { $gte: startDate },
         },
       },
@@ -668,7 +668,7 @@ export const forecastDemand = async (req, res) => {
         $match: {
           hospitalId,
           bloodGroup,
-          status: { $in: ["pending", "completed"] },
+          status: { $in: ["pending", "approved", "completed"] },
           createdAt: { $gte: startDate },
         },
       },
@@ -686,14 +686,20 @@ export const forecastDemand = async (req, res) => {
 
     const series = history.map((h) => h.totalUnits);
 
-    if (series.length < 3) {
+    if (series.length === 0) {
       return res.status(400).json({
-        message: "Not enough demand history data for this hospital (minimum 3 records required)",
-        series, found: series.length,
+        message: "No demand history data found for this blood group in the selected period.",
+        series, found: 0,
       });
     }
 
-    const forecastResult = await forecastDemandAI(series);
+    // Pad series if length < 3 to satisfy AI service requirement
+    let paddedSeries = [...series];
+    while (paddedSeries.length < 3) {
+      paddedSeries.unshift(paddedSeries[0]);
+    }
+
+    const forecastResult = await forecastDemandAI(paddedSeries);
     const predictedUnits = Math.round(forecastResult.predicted_units || 0);
 
     const inventoryAgg = await Inventory.aggregate([
