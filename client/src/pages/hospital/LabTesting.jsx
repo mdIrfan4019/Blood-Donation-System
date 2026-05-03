@@ -66,8 +66,15 @@ export default function LabTesting() {
     return matchesSearch && matchesGroup && matchesStatus;
   });
 
-  const handleClaim = (id) => {
-    dispatch(claimDonationThunk(id));
+  const handleClaim = async (id) => {
+    try {
+      const result = await dispatch(claimDonationThunk(id)).unwrap();
+      if (result.donation) {
+        setSelectedDonation(result.donation);
+      }
+    } catch (err) {
+      console.error("Failed to claim donation:", err);
+    }
   };
 
   const handleSubmit = (e) => {
